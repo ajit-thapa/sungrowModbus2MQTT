@@ -1,0 +1,18 @@
+[Unit]
+Description=Sungrow Modbus2MQTT Bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=homeassistant
+WorkingDirectory=/home/homeassistant/sungrow-modbus2mqtt
+ExecStart=/usr/bin/python3 -m sungrow_modbus2mqtt.bridge -c sungrow_modbus2mqtt/config.yaml
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sungrow-bridge
+
+[Install]
+WantedBy=multi-user.target

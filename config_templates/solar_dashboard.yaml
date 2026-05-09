@@ -1,0 +1,205 @@
+# Lovelace Solar Dashboard Configuration
+#
+# Add this to Home Assistant:
+# 1. Go to Settings → Dashboards → Create Dashboard
+# 2. Click the three dots → Edit dashboard
+# 3. Click "Edit in YAML"
+# 4. Paste the content below
+#
+
+title: Solar
+icon: mdi:solar-power
+path: solar
+cards:
+  # Header card with current generation
+  - type: grid
+    columns: 4
+    cards:
+      # Current Power Generation
+      - type: custom:gauge-card
+        entity: sensor.sungrow_total_active_power
+        title: Current Power
+        min: 0
+        max: 10000
+        unit: W
+        needle: true
+        sectors:
+          - from: 0
+            to: 2500
+            color: "#ff6b6b"
+          - from: 2500
+            to: 5000
+            color: "#ffa94d"
+          - from: 5000
+            to: 10000
+            color: "#51cf66"
+
+      # Today's Generation
+      - type: statistic
+        entity: sensor.sungrow_daily_yield
+        period: day
+        stat_period: day
+        name: Today's Yield
+        unit_of_measurement: kWh
+
+      # Inverter Temperature
+      - type: gauge
+        entity: sensor.sungrow_internal_temperature
+        name: Inverter Temp
+        min: 0
+        max: 80
+        unit: °C
+        severity:
+          green: 60
+          yellow: 70
+          red: 80
+
+      # Grid Frequency
+      - type: gauge
+        entity: sensor.sungrow_grid_frequency
+        name: Grid Frequency
+        min: 49
+        max: 51
+        unit: Hz
+        severity:
+          green: [49.8, 50.2]
+          yellow: [49.5, 50.5]
+          red: 0
+
+  # Charts and graphs
+  - type: grid
+    columns: 2
+    cards:
+      # Power history (requires ApexCharts card)
+      - type: custom:apexcharts-card
+        header:
+          title: Power Generation
+        series:
+          - entity: sensor.sungrow_total_active_power
+            name: Power
+            type: area
+            color: "#ffc107"
+            stroke_width: 2
+            data_generator: |
+              return entity.attributes.history.map((point, index) => {
+                return [point.timestamp, point.state];
+              });
+        apex_config:
+          chart:
+            type: area
+            stacked: false
+          xaxis:
+            type: datetime
+          yaxis:
+            title:
+              text: "Power (W)"
+
+      # Daily yield history
+      - type: custom:mini-graph-card
+        entity: sensor.sungrow_daily_yield
+        name: Daily Yield
+        unit: kWh
+        hours_to_show: 24
+        aggregate_func: avg
+        group_by: hour
+
+  # System Statistics
+  - type: entities
+    title: System Statistics
+    show_header_toggle: false
+    entities:
+      - entity: sensor.sungrow_nominal_active_power
+        name: Nominal Power
+      - entity: sensor.sungrow_total_running_time
+        name: Total Operating Time
+      - entity: sensor.sungrow_power_factor
+        name: Power Factor
+      - entity: sensor.sungrow_reactive_power
+        name: Reactive Power
+
+  # Voltage & Current Details
+  - type: grid
+    columns: 3
+    cards:
+      # Phase A Voltage
+      - type: gauge
+        entity: sensor.sungrow_phase_a_voltage
+        name: Phase A Voltage
+        min: 0
+        max: 300
+        unit: V
+
+      # Phase A Current
+      - type: gauge
+        entity: sensor.sungrow_phase_a_current
+        name: Phase A Current
+        min: 0
+        max: 50
+        unit: A
+
+      # Reactive Power
+      - type: gauge
+        entity: sensor.sungrow_reactive_power
+        name: Reactive Power
+        min: -5000
+        max: 5000
+        unit: var
+
+  # MPPT Details (for multi-string arrays)
+  - type: grid
+    columns: 2
+    cards:
+      # MPPT1
+      - type: entities
+        title: MPPT 1
+        entities:
+          - entity: sensor.sungrow_mppt1_voltage
+            name: Voltage
+          - entity: sensor.sungrow_mppt1_current
+            name: Current
+
+      # MPPT2
+      - type: entities
+        title: MPPT 2
+        entities:
+          - entity: sensor.sungrow_mppt2_voltage
+            name: Voltage
+          - entity: sensor.sungrow_mppt2_current
+            name: Current
+
+  # Total Energy Statistics
+  - type: entities
+    title: Energy Statistics
+    show_header_toggle: false
+    entities:
+      - entity: sensor.sungrow_total_yield
+        name: Lifetime Yield
+      - entity: utility_meter.solar_daily
+        name: Daily Consumption
+      - entity: utility_meter.solar_monthly
+        name: Monthly Consumption
+      - entity: utility_meter.solar_yearly
+        name: Yearly Consumption
+
+  # Export Control
+  - type: entities
+    title: Export Control
+    show_header_toggle: false
+    entities:
+      - entity: number.sungrow_export_limit_percent
+        name: Export Limit %
+
+  # Alerts & Notifications
+  - type: custom:stack-in-card
+    cards:
+      - type: entities
+        title: System Health
+        entities:
+          - condition: state
+            entity: sensor.sungrow_internal_temperature
+            state_not: unavailable
+      - type: history-stats
+        title: Operational Time Today
+        entity: binary_sensor.sungrow_inverter_on
+        stat_period: day
+        state: "on"

@@ -1,0 +1,14 @@
+inverter:
+  host: "192.168.1.100"
+  port: 502
+  slave: 1
+  scan_interval: 10
+
+mqtt:
+  host: "localhost"
+  port: 1883
+  username: ""
+  password: ""
+  topic_prefix: "sungrow/sg10rt"
+  ha_discovery: true
+  ha_discovery_prefix: "homeassistant"

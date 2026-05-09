@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sungrow SG10RT",
+        "description": "Connect to your Sungrow inverter via Modbus TCP. Use the internal LAN port, not the WiNet port.",
+        "data": {
+          "host": "IP Address",
+          "port": "Port",
+          "slave": "Slave ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to inverter. Verify the IP address and that you're using the internal LAN port."
+    }
+  }
+}

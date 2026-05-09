@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: sungrow_mosquitto
+    restart: unless-stopped
+    volumes:
+      - ./docker/mosquitto/config:/mosquitto/config
+      - ./docker/mosquitto/data:/mosquitto/data
+      - ./docker/mosquitto/log:/mosquitto/log
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - sungrow
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-h", "localhost", "-t", "test"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  sungrow_bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sungrow_bridge
+    restart: unless-stopped
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+    volumes:
+      - ./sungrow_modbus2mqtt/config.yaml:/app/config.yaml
+    environment:
+      - INVERTER_HOST=${INVERTER_HOST:-192.168.9.106}
+      - INVERTER_PORT=${INVERTER_PORT:-502}
+      - INVERTER_SLAVE=${INVERTER_SLAVE:-1}
+      - MQTT_HOST=${MQTT_HOST:-mosquitto}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - MQTT_USERNAME=${MQTT_USERNAME:-ha_user}
+      - MQTT_PASSWORD=${MQTT_PASSWORD:-sungrow_password}
+      - MQTT_TOPIC_PREFIX=${MQTT_TOPIC_PREFIX:-sungrow/sg10rt}
+      - SCAN_INTERVAL=${SCAN_INTERVAL:-10}
+    networks:
+      - sungrow
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  sungrow:
+    driver: bridge
+
+volumes:
+  mosquitto_config:
+  mosquitto_data:
+  mosquitto_log:

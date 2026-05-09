@@ -1,0 +1,251 @@
+# Sungrow Modbus2MQTT Integration - Home Assistant Configuration Template
+#
+# Choose ONE of the three options below based on your integration method:
+# - Option 1: Direct Modbus (HA Component)
+# - Option 2: MQTT Bridge
+# - Option 3: Both
+
+###############################################################################
+# OPTION 1: DIRECT MODBUS (Home Assistant Custom Component)
+###############################################################################
+#
+# Use this if you installed custom_components/sungrow_sg10rt/
+# Requires: pysungrow library
+#
+
+#sungrow_sg10rt:
+#  - host: 192.168.9.106
+#    port: 502
+#    slave: 1
+
+###############################################################################
+# OPTION 2: MQTT BRIDGE
+###############################################################################
+#
+# Use this if running sungrow_modbus2mqtt/bridge.py
+# Requires: MQTT broker (Mosquitto)
+#
+
+#mqtt:
+#  broker: 192.168.1.50
+#  port: 1883
+#  username: ha_user
+#  password: sungrow_password
+#  discovery: true
+#  discovery_prefix: homeassistant
+
+###############################################################################
+# OPTION 3: HYBRID (Both Modbus + MQTT)
+###############################################################################
+#
+# Use this for real-time Modbus + multi-system MQTT access
+#
+
+# Direct Modbus for primary HA instance
+#sungrow_sg10rt:
+#  - host: 192.168.9.106
+#    port: 502
+#    slave: 1
+
+# MQTT for secondary systems or redundancy
+#mqtt:
+#  broker: 192.168.1.50
+#  port: 1883
+#  username: ha_user
+#  password: sungrow_password
+#  discovery: true
+
+###############################################################################
+# TEMPLATE SENSORS (Derived metrics)
+###############################################################################
+
+#template:
+#  - sensor:
+#      # Generation percentage of nominal capacity
+#      - name: "Solar Generation %"
+#        unique_id: solar_gen_percent
+#        unit_of_measurement: "%"
+#        state: >
+#          {% set power = states('sensor.sungrow_total_active_power') | float(0) %}
+#          {% set nominal = states('sensor.sungrow_nominal_active_power') | float(10000) %}
+#          {{ ((power / nominal) * 100) | round(0) }}
+#
+#      # Daily revenue (if you want to track economic value)
+#      - name: "Daily Solar Value"
+#        unique_id: daily_solar_value
+#        unit_of_measurement: "€"
+#        state: >
+#          {% set yield_kwh = states('sensor.sungrow_daily_yield') | float(0) %}
+#          {% set price_per_kwh = 0.35 %}
+#          {{ (yield_kwh * price_per_kwh) | round(2) }}
+
+###############################################################################
+# UTILITY METERS (Energy tracking)
+###############################################################################
+
+#utility_meter:
+#  solar_daily:
+#    source: sensor.sungrow_daily_yield
+#    cycle: daily
+#    name: "Solar Daily"
+#
+#  solar_monthly:
+#    source: sensor.sungrow_total_yield
+#    cycle: monthly
+#    name: "Solar Monthly"
+#
+#  solar_yearly:
+#    source: sensor.sungrow_total_yield
+#    cycle: yearly
+#    name: "Solar Yearly"
+
+###############################################################################
+# NUMBER CONTROLS (Export limiting)
+###############################################################################
+
+#number:
+#  - platform: template
+#    name: "Solar Export Limit"
+#    unique_id: solar_export_limit
+#    unit_of_measurement: "%"
+#    min_value: 0
+#    max_value: 100
+#    step: 5
+#    set_value: >
+#      {% set pct = value %}
+#      {{ service.number.set_value }}
+
+###############################################################################
+# AUTOMATIONS (Example: export limiting)
+###############################################################################
+
+#automation:
+#  # Limit export when grid is congested (high frequency)
+#  - alias: "Limit Solar Export on High Frequency"
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.sungrow_grid_frequency
+#        above: 50.05
+#        for:
+#          minutes: 5
+#    action:
+#      - service: number.set_value
+#        target:
+#          entity_id: number.sungrow_export_limit_percent
+#        data:
+#          value: 50
+#      - service: notify.notify
+#        data:
+#          title: "⚡ Export Limited"
+#          message: "Grid frequency high: {{ states('sensor.sungrow_grid_frequency') }} Hz"
+#
+#  # Restore full export when grid normalizes
+#  - alias: "Restore Solar Export"
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.sungrow_grid_frequency
+#        below: 49.95
+#        for:
+#          minutes: 10
+#    action:
+#      - service: number.set_value
+#        target:
+#          entity_id: number.sungrow_export_limit_percent
+#        data:
+#          value: 100
+#
+#  # Alert if temperature too high
+#  - alias: "Inverter Temperature Warning"
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.sungrow_internal_temperature
+#        above: 70
+#    action:
+#      - service: persistent_notification.create
+#        data:
+#          title: "⚠️ Inverter Hot"
+#          message: >
+#            Temperature: {{ states('sensor.sungrow_internal_temperature') }}°C
+#            Check cooling and shade the inverter.
+#          notification_id: inverter_temp
+
+###############################################################################
+# LOGGING (Debugging)
+###############################################################################
+
+#logger:
+#  default: info
+#  logs:
+#    sungrow_sg10rt: debug
+#    sungrow_modbus2mqtt: debug
+
+###############################################################################
+# RECORDER (Keep history for graphs)
+###############################################################################
+
+#recorder:
+#  purge_keep_days: 30
+#  db_url: sqlite:////config/home-assistant_v2.db
+#  include:
+#    entities:
+#      - sensor.sungrow_total_active_power
+#      - sensor.sungrow_daily_yield
+#      - sensor.sungrow_total_yield
+#      - sensor.sungrow_internal_temperature
+
+###############################################################################
+# GROUPS (Dashboard organization)
+###############################################################################
+
+#group:
+#  solar_system:
+#    name: "Solar System"
+#    icon: mdi:solar-power
+#    entities:
+#      - sensor.sungrow_total_active_power
+#      - sensor.sungrow_daily_yield
+#      - sensor.sungrow_total_yield
+#      - sensor.sungrow_internal_temperature
+#      - sensor.sungrow_grid_frequency
+#      - number.sungrow_export_limit_percent
+
+###############################################################################
+# SCRIPTS (Manual controls)
+###############################################################################
+
+#script:
+#  set_export_limit:
+#    description: "Set solar export limit"
+#    fields:
+#      percentage:
+#        name: "Percentage"
+#        description: "Export limit %"
+#        example: 50
+#    sequence:
+#      - service: number.set_value
+#        target:
+#          entity_id: number.sungrow_export_limit_percent
+#        data:
+#          value: "{{ percentage }}"
+
+###############################################################################
+# REST API (Advanced)
+###############################################################################
+
+#rest_command:
+#  get_sungrow_status:
+#    url: "http://{{ states('input_text.sungrow_ip') }}/api/me/station"
+#    method: GET
+
+###############################################################################
+# INTEGRATION ENERGY DASHBOARD
+###############################################################################
+
+#
+# To use the built-in Energy Dashboard:
+# 1. Go to Settings → Dashboards → Energy
+# 2. Click "Solar production"
+# 3. Select: sensor.sungrow_total_yield
+#
+# This will automatically track daily, monthly, yearly generation.
+#
