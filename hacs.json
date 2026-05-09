@@ -3,7 +3,5 @@
   "domains": ["sungrow"],
   "documentation": "https://github.com/ajit-thapa/sungrowModbus2MQTT",
   "issue_tracker": "https://github.com/ajit-thapa/sungrowModbus2MQTT/issues",
-  "requirements": ["pysungrow>=1.0.0"],
-  "homeassistant": "2023.1.0",
-  "integrations": []
+  "homeassistant": "2023.1.0"
 }
