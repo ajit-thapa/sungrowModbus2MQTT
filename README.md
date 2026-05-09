@@ -1,68 +1,48 @@
 # Sungrow Modbus2MQTT Integration
 
-Comprehensive integration for Sungrow inverters with Home Assistant using Modbus TCP.
+Comprehensive Modbus TCP integration for Sungrow inverters with Home Assistant.
 
-⚠️ **CRITICAL FOR SG10RT**: This inverter requires **WiNet-S dongle** for Modbus TCP, not the internal LAN port.
+**Supports**: SG10RT, SG series, SH series, and other Sungrow models
 
-## 🎯 Recommended Path: mkaiser Integration (HACS)
+## 📦 Installation Options
 
-For **full control** including export curtailment, use the battle-tested production integration:
+### Option 1: Home Assistant Custom Component (Recommended)
 
-### **[mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant](https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant)**
+#### Via HACS
 
-✅ **Why this approach**:
-- 5+ years production-tested
-- Full SG10RT support via WiNet-S
-- Write capabilities (export limiting, curtailment)
-- Active maintenance
-- Available via HACS
+1. Home Assistant → **HACS** → **Integrations**
+2. Click **⋮** (top right) → **Custom repositories**
+3. Paste: `https://github.com/ajit-thapa/sungrowModbus2MQTT`
+4. Category: **Integration**
+5. Click **Create**
+6. Search **"Sungrow"** and click **Download**
+7. Restart Home Assistant
+8. Settings → Devices & Services → **Create Integration** → **Sungrow Inverter**
+9. Enter your inverter IP, port (502), and slave ID (1)
 
-**Quick install via HACS**:
-1. Home Assistant → HACS → Integrations
-2. Click "Custom repositories" (⋮ menu)
-3. Add: `https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant`
-4. Category: Integration
-5. Search "Sungrow" and install
-6. Restart Home Assistant
-7. Settings → Devices & Services → Create Integration
+#### Manual Installation
 
-See [MKAISER_SETUP.md](MKAISER_SETUP.md) for detailed guide.
-
-## Alternative: This Repository (HACS-Ready Custom Component)
-
-Use this if you want:
-- Simple read-only monitoring
-- Custom Modbus bridge + MQTT
-- Docker deployment
-
-### Option 1A: HACS Installation (Recommended for component)
-
-1. Home Assistant → HACS → Integrations
-2. Click "Custom repositories" (⋮ menu)
-3. Add: `https://github.com/ajit-thapa/sungrowModbus2MQTT`
-4. Category: Integration
-5. Search "Sungrow SG10RT" and install
-6. Restart Home Assistant
-7. Settings → Devices & Services → Create Integration → Enter inverter IP
-
-### Option 1B: Manual Installation (No HACS)
-
-1. Copy `custom_components/sungrow_sg10rt/` to your HA `custom_components` folder
+1. Copy `custom_components/sungrow/` to `~/.homeassistant/custom_components/`
 2. Restart Home Assistant
-3. Settings → Devices & Services → Create Integration → "Sungrow SG10RT"
-4. Enter inverter IP, port (502), slave ID (1)
+3. Settings → Devices & Services → Create Integration → Sungrow Inverter
 
-### Option 2: Modbus2MQTT Bridge
+### Option 2: Modbus2MQTT Bridge (Multi-System)
 
-1. Install: `pip install -r requirements.txt`
-2. Edit `sungrow_modbus2mqtt/config.yaml`
-3. Run: `python -m sungrow_modbus2mqtt.bridge`
+For MQTT-based integration or multiple systems:
 
-### Option 3: Docker (All-in-one)
+```bash
+pip install -r requirements.txt
+# Edit sungrow_modbus2mqtt/config.yaml with your settings
+python -m sungrow_modbus2mqtt.bridge
+```
+
+### Option 3: Docker (All-in-One)
 
 ```bash
 docker-compose up -d
 ```
+
+Includes Mosquitto MQTT broker + bridge
 
 ## Supported Models
 

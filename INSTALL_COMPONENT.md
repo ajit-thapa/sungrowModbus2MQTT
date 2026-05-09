@@ -47,7 +47,7 @@ mkdir -p /path/to/config/custom_components/
 ### Option A: Copy from This Repository
 
 ```bash
-cp -r custom_components/sungrow_sg10rt /path/to/config/custom_components/
+cp -r custom_components/sungrow /path/to/config/custom_components/
 ```
 
 ### Option B: Manual Setup (if git not available)
@@ -55,7 +55,7 @@ cp -r custom_components/sungrow_sg10rt /path/to/config/custom_components/
 Create the directory structure:
 ```
 custom_components/
-└── sungrow_sg10rt/
+└── sungrow/
     ├── __init__.py
     ├── config_flow.py
     ├── const.py
@@ -70,7 +70,7 @@ Copy each file from this repository into the corresponding location.
 ### Verify Installation
 
 ```bash
-ls -la /path/to/config/custom_components/sungrow_sg10rt/
+ls -la /path/to/config/custom_components/sungrow/
 # Should show:
 # __init__.py
 # config_flow.py
@@ -117,7 +117,7 @@ systemctl restart homeassistant  # If using systemd
 Edit `configuration.yaml`:
 
 ```yaml
-sungrow_sg10rt:
+sungrow:
   - host: 192.168.9.106
     port: 502
     slave: 1
@@ -232,7 +232,7 @@ automation:
 
 **Verify files:**
 ```bash
-ls -la /path/to/config/custom_components/sungrow_sg10rt/
+ls -la /path/to/config/custom_components/sungrow/
 # Should have 7 files
 ```
 

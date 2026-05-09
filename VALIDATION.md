@@ -319,6 +319,6 @@ Before proceeding with integration setup, verify **ALL** of these:
 ---
 
 **Once all items are checked**, proceed to:
-- **Full control + export limiting**: [MKAISER_SETUP.md](MKAISER_SETUP.md)
-- **Simple component**: [INSTALL_COMPONENT.md](INSTALL_COMPONENT.md)
-- **MQTT bridge**: [SETUP.md](SETUP.md)
+- **HA Component**: [INSTALL_COMPONENT.md](INSTALL_COMPONENT.md)
+- **MQTT Bridge**: [SETUP.md](SETUP.md)
+- **Configuration Guide**: [CONFIG.md](CONFIG.md)

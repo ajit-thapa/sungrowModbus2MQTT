@@ -1,14 +1,14 @@
-DOMAIN = "sungrow_sg10rt"
-DEFAULT_NAME = "Sungrow SG10RT"
+DOMAIN = "sungrow"
+DEFAULT_NAME = "Sungrow Inverter"
 DEFAULT_PORT = 502
 DEFAULT_SLAVE = 1
 
-# ⚠️ CRITICAL NOTES FOR SG10RT:
-# 1. Requires WiNet-S dongle for Modbus TCP (NOT internal LAN port)
-# 2. Modbus TCP must be enabled on inverter: Settings → Communication → Modbus TCP
-# 3. 0kW export limit = UNLIMITED (not zero). Use 10W for actual zero export.
-# 4. This component is read-only. For write/export limiting, use mkaiser integration:
-#    https://github.com/mkaiser/Sungrow-SHx-Inverter-Modbus-Home-Assistant
+# ⚠️ CRITICAL NOTES:
+# 1. Modbus TCP must be enabled on inverter: Settings → Communication → Modbus TCP
+# 2. SG series (SG10RT, etc.): Requires WiNet-S dongle, NOT internal LAN port
+# 3. SH series: Can use internal LAN port or WiNet-S
+# 4. 0kW export limit = UNLIMITED (not zero). Use 10W for actual zero export.
+# 5. Register addresses may vary by model - adjust SENSOR_REGISTERS if needed
 
 SENSOR_REGISTERS = {
     "total_active_power": {

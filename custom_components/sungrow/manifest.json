@@ -1,6 +1,6 @@
 {
-  "domain": "sungrow_sg10rt",
-  "name": "Sungrow SG10RT Inverter",
+  "domain": "sungrow",
+  "name": "Sungrow Inverter",
   "version": "1.0.0",
   "requirements": ["pysungrow>=1.0.0"],
   "dependencies": [],
